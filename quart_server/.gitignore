@@ -1,0 +1,7 @@
+venv/
+log/
+.idea/
+__pycache__/
+credentials/
+string_auth.txt
+config.py
