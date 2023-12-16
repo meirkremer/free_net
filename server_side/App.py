@@ -24,7 +24,10 @@ def search_movie():
         return {'user not exists': 0}
     search_string = data.get('searchText')  # Extract the 'searchString' field
     insert_search(email, search_string, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-    response = requests.post('http://127.0.0.1:5001/search', data=search_string.encode('utf-8'))
+    try:
+        response = requests.post('http://127.0.0.1:5001/search', data=search_string.encode('utf-8'), timeout=60)
+    except requests.exceptions.ReadTimeout:
+        return {}, 500
     return response.content
 
 
