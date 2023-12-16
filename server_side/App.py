@@ -27,7 +27,7 @@ def search_movie():
     try:
         response = requests.post('http://127.0.0.1:5001/search', data=search_string.encode('utf-8'), timeout=60)
     except requests.exceptions.ReadTimeout:
-        return {}, 500
+        return {}
     return response.content
 
 
