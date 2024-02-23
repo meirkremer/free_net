@@ -3,6 +3,7 @@ from flask import Flask, request
 from config import private_config as conf
 from def_db import db, User, Search, Download
 import json
+import csv
 
 app = Flask(__name__)
 
@@ -151,6 +152,34 @@ def get_use_summery():
         'all_downloads_size': downloads_size / 1024**3
     }
     return json.dumps(use_summery, ensure_ascii=False)
+
+
+@app.route('/user-summary/<string:username>', methods=['GET'])
+def get_user_summary(username):
+    user = db.session.query(User).filter_by(user_email=username).first()
+    if not user:
+        return {}
+    user_id = user.user_id
+    downloads = db.session.query(Download).filter_by(user_id=user_id).all()
+    use_summary = {download.download_id: {
+        'file_name': download.file_name,
+        'file_size': download.file_size,
+        'date_time': f'{download.date_time}'
+    }
+        for download in downloads
+    }
+    return json.dumps(use_summary, ensure_ascii=False)
+
+
+@app.route('/to-csv', methods=['GET'])
+def download_to_csv():
+    downloads = db.session.query(Download).all()
+    with open('downloads.csv', 'w', encoding='utf-8', newline='') as f:
+        writer = csv.writer(f)
+        data = [[get_user_name(download.user_id), download.file_name, download.file_size, download.date_time]
+                for download in downloads]
+        writer.writerows(data)
+    return 'ok'
 
 
 if __name__ == '__main__':

@@ -97,8 +97,48 @@ def use_summary():
     rout = MAIN_URL + '/use-summery'
     response = requests.get(rout)
     response = json.loads(response.content)
+
     return response
 
 
+def user_summary(user_email):
+    rout = MAIN_URL + f'/user-summary/{user_email}'
+    response = requests.get(rout)
+    response = json.loads(response.content)
+
+    return response
+
+
+def print_use_summary():
+    response = use_summary()
+    print(type(response))
+    print(response)
+    sum_search = response.get('sum_searches')
+    sum_downloads = response.get('sum_downloads')
+    downloads_size = response.get('all_downloads_size')
+
+    print(f'free net use summary:\nsearches: {sum_search}\ndownloads: {sum_downloads}\n'
+          f'all files size: {downloads_size:.3f} GB')
+
+
+def print_user_summary(user_email):
+    response = user_summary(user_email)
+    sum_size = 0
+    for key in response:
+        download = response[key]
+        sum_size += int(download.get("file_size"))
+        print(f'file name: {download.get("file_name")}\n'
+              f'file size: {(int(download.get("file_size")) / 1024**3):.3f} GB\n'
+              f'date: {download.get("date_time")}\n')
+    print(f'sum size: {(sum_size / 1024**3):.3f} GB')
+    print(f'sum files: {len(response)}')
+
+
+def to_csv():
+    rout = MAIN_URL + '/to-csv'
+    response = requests.get(rout)
+    print(response.status_code)
+
+
 if __name__ == '__main__':
-    print(use_summary())
+    to_csv()
